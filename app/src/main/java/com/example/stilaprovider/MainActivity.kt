@@ -67,19 +67,21 @@ class MainActivity : AppCompatActivity() {
             sortOrder
         )
 
-        mCursor?.apply {
+        mCursor?.use {cursor ->
             // Determine the column index of the column named "timestamp"
-            val tsIdx: Int = getColumnIndex(StilaStressScoreContract.ComputedStressEntry.COLUMN_NAME_TIMESTAMP)
-            val scoreIdx: Int = getColumnIndex(StilaStressScoreContract.ComputedStressEntry.COLUMN_NAME_STRESS_SCORE)
+            val tsIdx: Int = cursor.getColumnIndex(StilaStressScoreContract.ComputedStressEntry.COLUMN_NAME_TIMESTAMP)
+            val scoreIdx: Int = cursor.getColumnIndex(StilaStressScoreContract.ComputedStressEntry.COLUMN_NAME_STRESS_SCORE)
 
-            while (moveToNext()) {
+            while (cursor.moveToNext()) {
                 // added new stress score to the list
                 mutableList.add(
-                    StressScore(getLong(tsIdx), getInt(scoreIdx))
+                    StressScore(cursor.getLong(tsIdx), cursor.getInt(scoreIdx))
                 )
             }
-            mCursor.close()
+            // resource is closed by use block automatically, inside the apply block you will need to close resource manually
+            // mCursor.close()
         }
+
         return mutableList.toList()
     }
 
